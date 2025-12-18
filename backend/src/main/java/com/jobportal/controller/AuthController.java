@@ -1,3 +1,4 @@
+// src/main/java/com/jobportal/controller/AuthController.java
 package com.jobportal.controller;
 
 import com.jobportal.dto.request.LoginRequest;
@@ -6,76 +7,85 @@ import com.jobportal.dto.response.ApiResponse;
 import com.jobportal.dto.response.AuthResponse;
 import com.jobportal.service.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
     
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
     
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            AuthResponse authResponse = authService.register(request);
-            
-            ApiResponse response = ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(200)
-                    .message("User registered successfully")
-                    .data(authResponse)
-                    .build();
-            
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            ApiResponse response = ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(400)
-                    .message(e.getMessage())
-                    .build();
-            
-            return ResponseEntity.badRequest().body(response);
-        }
+        AuthResponse response = authService.register(request);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", response);
+        
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setTimestamp(LocalDateTime.now());
+        apiResponse.setStatus(HttpStatus.CREATED.value());
+        apiResponse.setMessage("User registered successfully");
+        apiResponse.setData(data);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
     
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            AuthResponse authResponse = authService.login(request);
-            
-            ApiResponse response = ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(200)
-                    .message("Login successful")
-                    .data(authResponse)
-                    .build();
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            ApiResponse response = ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(401)
-                    .message("Invalid email or password")
-                    .build();
-            
-            return ResponseEntity.status(401).body(response);
-        }
+        AuthResponse response = authService.login(request);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", response);
+        
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setTimestamp(LocalDateTime.now());
+        apiResponse.setStatus(HttpStatus.OK.value());
+        apiResponse.setMessage("Login successful");
+        apiResponse.setData(data);
+        
+        return ResponseEntity.ok(apiResponse);
     }
     
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse> getCurrentUser() {
-        ApiResponse response = ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(200)
-                .message("Current user endpoint - requires authentication")
-                .data("You are authenticated!")
-                .build();
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<ApiResponse> checkEmail(@PathVariable String email) {
+        boolean exists = authService.existsByEmail(email);
         
-        return ResponseEntity.ok(response);
+        Map<String, Object> data = new HashMap<>();
+        data.put("exists", exists);
+        
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setTimestamp(LocalDateTime.now());
+        apiResponse.setStatus(HttpStatus.OK.value());
+        apiResponse.setMessage(exists ? "Email already registered" : "Email available");
+        apiResponse.setData(data);
+        
+        return ResponseEntity.ok(apiResponse);
+    }
+    
+    @GetMapping("/check-username/{username}")
+    public ResponseEntity<ApiResponse> checkUsername(@PathVariable String username) {
+        boolean exists = authService.existsByUsername(username);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("exists", exists);
+        
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setTimestamp(LocalDateTime.now());
+        apiResponse.setStatus(HttpStatus.OK.value());
+        apiResponse.setMessage(exists ? "Username already taken" : "Username available");
+        apiResponse.setData(data);
+        
+        return ResponseEntity.ok(apiResponse);
     }
 }
