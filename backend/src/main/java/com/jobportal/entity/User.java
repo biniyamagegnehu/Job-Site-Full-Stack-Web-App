@@ -43,9 +43,6 @@ public abstract class User extends BaseEntity {
     private boolean isLocked = false;
 
     // Getters and Setters
-    public Long getId() { return super.getId(); }
-    public void setId(Long id) { super.setId(id); }
-    
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     
