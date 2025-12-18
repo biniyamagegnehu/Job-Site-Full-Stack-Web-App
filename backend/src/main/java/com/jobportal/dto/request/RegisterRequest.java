@@ -30,4 +30,14 @@ public class RegisterRequest {
     
     @NotBlank(message = "User type is required")
     private UserRole userType; // ROLE_JOB_SEEKER or ROLE_EMPLOYER
+    
+    // For Job Seeker (optional fields)
+    private String address;
+    private String city;
+    private String country;
+    
+    // For Employer (optional fields)
+    private String companyName;
+    private String companyDescription;
+    private String companyWebsite;
 }
