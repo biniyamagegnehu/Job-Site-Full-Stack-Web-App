@@ -19,3 +19,6 @@ public class AdminDashboardResponse {
     private Map<String, Long> jobsByType;
 }
 
+
+
+

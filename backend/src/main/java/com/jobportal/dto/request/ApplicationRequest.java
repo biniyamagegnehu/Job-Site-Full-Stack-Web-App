@@ -14,3 +14,6 @@ public class ApplicationRequest {
     private String cvFileUrl;
 }
 
+
+
+

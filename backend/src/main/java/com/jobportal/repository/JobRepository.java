@@ -46,3 +46,6 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     List<Job> findByEmployerIdAndIsActive(Long employerId, boolean isActive);
 }
 
+
+
+

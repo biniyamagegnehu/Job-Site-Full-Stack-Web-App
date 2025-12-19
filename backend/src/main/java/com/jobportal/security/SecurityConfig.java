@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/test/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/jobs/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/jobs")).permitAll()
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )

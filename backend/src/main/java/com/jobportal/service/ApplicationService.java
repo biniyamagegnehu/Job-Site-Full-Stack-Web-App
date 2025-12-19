@@ -27,3 +27,6 @@ public interface ApplicationService {
     boolean hasApplied(Long jobId, Long jobSeekerId);
 }
 
+
+
+
