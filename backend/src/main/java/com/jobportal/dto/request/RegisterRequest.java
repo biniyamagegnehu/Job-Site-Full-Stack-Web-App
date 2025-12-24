@@ -34,7 +34,7 @@ public class RegisterRequest {
     private String firstName;
     private String lastName;
 
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Phone number should be valid")
+    @Pattern(regexp = "^$|^\\+?[1-9]\\d{1,14}$", message = "Phone number should be valid")
     private String phone;
 
     // Job Seeker specific
@@ -45,6 +45,7 @@ public class RegisterRequest {
     private String companyName;
     private String companyWebsite;
 
+    // Validation helpers
     public boolean isJobSeeker() {
         return role == UserRole.ROLE_JOB_SEEKER; // Fix enum reference
     }
@@ -55,5 +56,16 @@ public class RegisterRequest {
 
     public boolean isAdmin() {
         return role == UserRole.ROLE_ADMIN; // Fix enum reference
+    }
+
+    // Ensure employer-specific required fields are present when role is EMPLOYER
+    @jakarta.validation.constraints.AssertTrue(message = "Company name is required for employers")
+    public boolean isEmployerCompanyNameValid() {
+        if (role == null)
+            return true; // other validation (@NotNull) will handle role
+        if (role == UserRole.ROLE_EMPLOYER) {
+            return companyName != null && !companyName.trim().isEmpty();
+        }
+        return true;
     }
 }

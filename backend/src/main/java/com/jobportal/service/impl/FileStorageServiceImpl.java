@@ -46,7 +46,23 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new RuntimeException("Failed to delete file", e);
         }
     }
+
+    @Override
+    public org.springframework.core.io.Resource loadFileAsResource(String subdirectory, String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir, subdirectory).resolve(filename).normalize();
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File not found: " + filename);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load file as resource", e);
+        }
+    }
 }
+
 
 
 

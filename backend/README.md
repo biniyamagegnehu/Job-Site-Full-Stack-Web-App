@@ -33,3 +33,14 @@ A production-ready job portal backend built with Spring Boot, Spring Security, a
 ```bash
 git clone <repository-url>
 cd job-portal-backend
+```
+
+### Local development (H2 database)
+
+For quick local development the project can use an embedded H2 database. By default the project is configured to use a file-based H2 database (stored in `backend/data`) so data persists between restarts. To use the in-memory mode instead, edit `src/main/resources/application.properties` and set:
+
+```
+spring.datasource.url=jdbc:h2:mem:jobportal;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+```
+
+H2 console is available at `/h2-console` when running locally.

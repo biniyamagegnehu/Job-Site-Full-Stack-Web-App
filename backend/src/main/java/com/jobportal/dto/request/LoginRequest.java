@@ -1,16 +1,15 @@
 package com.jobportal.dto.request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequest {
-    
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String email;
-    
+
+    // Accept either email or username in this field. Validation is handled in service.
+    @NotBlank(message = "Email or username is required")
+    private String identifier;
+
     @NotBlank(message = "Password is required")
     private String password;
 }

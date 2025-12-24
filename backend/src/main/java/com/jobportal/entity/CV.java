@@ -51,6 +51,9 @@ public class CV extends BaseEntity {
     
     @Column(name = "portfolio_url")
     private String portfolioUrl;
+
+    @Column(name = "file_url")
+    private String fileUrl;
     
     @Column(name = "template_name")
     private String templateName = "default";

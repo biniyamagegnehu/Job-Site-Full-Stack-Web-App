@@ -103,10 +103,12 @@ public class AuthService {
             employer.setCompanyWebsite(request.getCompanyWebsite());
             employer.setPhoneNumber(request.getPhone());
             employer.setRole(UserRole.ROLE_EMPLOYER);
-            employer.setEnabled(false);
+            // Employer accounts require admin approval by default
+            employer.setEnabled(true);
             employer.setLocked(false);
             employer.setApproved(false);
-            return employer;
+            employer.setApprovalStatus(com.jobportal.entity.Employer.ApprovalStatus.PENDING);
+            return employer; 
             
         } else if (request.getRole() == UserRole.ROLE_ADMIN) {
             throw new IllegalArgumentException("Admin registration not allowed through public endpoint");
@@ -118,10 +120,11 @@ public class AuthService {
     
     public AuthResponse login(LoginRequest request) {
         try {
-            // Authenticate user
+            // Authenticate user by email or username
+            String identifier = request.getIdentifier();
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    request.getEmail(),
+                    identifier,
                     request.getPassword()
                 )
             );
@@ -129,8 +132,13 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
             // Get user details
-            User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + request.getEmail()));
+            // Try to locate user by email first, then username
+            var userOpt = userRepository.findByEmail(identifier);
+            if (userOpt.isEmpty()) {
+                userOpt = userRepository.findByUsername(identifier);
+            }
+
+            User user = userOpt.orElseThrow(() -> new RuntimeException("User not found with identifier: " + identifier));
             
             // Check if user is enabled
             if (!user.isEnabled()) {

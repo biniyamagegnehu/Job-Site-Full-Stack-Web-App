@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 public class JobResponse {
-    
+
     private Long id;
     private String title;
     private String description;
@@ -24,6 +24,7 @@ public class JobResponse {
     private String salaryCurrency;
     private boolean isRemote;
     private boolean isActive;
+    private Job.ApprovalStatus approvalStatus;
     private LocalDate applicationDeadline;
     private Integer vacancies;
     private List<String> requiredSkills;
@@ -31,11 +32,8 @@ public class JobResponse {
     private Long employerId;
     private String employerName;
     private String employerCompanyName;
+    private String employerContactEmail;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long applicationCount;
 }
-
-
-
-

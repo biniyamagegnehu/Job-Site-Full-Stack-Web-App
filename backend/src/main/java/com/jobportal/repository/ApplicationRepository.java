@@ -32,4 +32,7 @@ public interface ApplicationRepository extends JpaRepository<JobApplication, Lon
     
     @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.jobSeeker.id = :jobSeekerId")
     Long countByJobSeekerId(@Param("jobSeekerId") Long jobSeekerId);
+    
+    @Query("SELECT COUNT(a) FROM JobApplication a WHERE a.status = :status")
+    Long countByStatus(@Param("status") JobApplication.ApplicationStatus status);
 }

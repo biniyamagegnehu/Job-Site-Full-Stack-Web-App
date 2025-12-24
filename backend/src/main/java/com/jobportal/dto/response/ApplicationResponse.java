@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ApplicationResponse {
-    
+
     private Long id;
     private Long jobId;
     private String jobTitle;
@@ -21,10 +21,8 @@ public class ApplicationResponse {
     private LocalDateTime applicationDate;
     private JobApplication.ApplicationStatus status;
     private String notes;
+    private String applicantEmail;
+    private Integer yearsOfExperience;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-
-
-
-

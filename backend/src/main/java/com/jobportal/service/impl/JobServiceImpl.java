@@ -20,99 +20,119 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class JobServiceImpl implements JobService {
-    
+
     private final JobRepository jobRepository;
     private final EmployerRepository employerRepository;
-    
+
     @Override
     public JobResponse createJob(Long employerId, JobRequest request) {
         Employer employer = employerRepository.findById(employerId)
-            .orElseThrow(() -> new ResourceNotFoundException("Employer not found with id: " + employerId));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Employer not found with id: " + employerId));
+
         if (!employer.isApproved()) {
             throw new IllegalStateException("Employer account must be approved to post jobs");
         }
-        
+
         Job job = new Job();
         mapRequestToEntity(request, job);
         job.setEmployer(employer);
-        
+        // New jobs require admin approval before being active
+        job.setActive(false);
+        job.setApprovalStatus(Job.ApprovalStatus.PENDING);
+
         Job savedJob = jobRepository.save(job);
         return mapEntityToResponse(savedJob);
     }
-    
+
     @Override
     public JobResponse updateJob(Long jobId, Long employerId, JobRequest request) {
         Job job = jobRepository.findByIdAndEmployerId(jobId, employerId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Job not found with id: " + jobId + " for employer: " + employerId));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Job not found with id: " + jobId + " for employer: " + employerId));
+
         mapRequestToEntity(request, job);
         Job updatedJob = jobRepository.save(job);
         return mapEntityToResponse(updatedJob);
     }
-    
+
     @Override
     public void deleteJob(Long jobId, Long employerId) {
         Job job = jobRepository.findByIdAndEmployerId(jobId, employerId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Job not found with id: " + jobId + " for employer: " + employerId));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Job not found with id: " + jobId + " for employer: " + employerId));
+
         jobRepository.delete(job);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public JobResponse getJobById(Long id) {
         Job job = jobRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
+
         return mapEntityToResponse(job);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<JobResponse> getAllActiveJobs(Pageable pageable) {
-        return jobRepository.findByIsActiveTrue(pageable)
-            .map(this::mapEntityToResponse);
+        return jobRepository.findByIsActiveTrueAndApprovalStatus(Job.ApprovalStatus.APPROVED, pageable)
+                .map(this::mapEntityToResponse);
     }
-    
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<JobResponse> getAllPendingJobs(Pageable pageable) {
+        return jobRepository.findByApprovalStatus(Job.ApprovalStatus.PENDING, pageable)
+                .map(this::mapEntityToResponse);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Page<JobResponse> getJobsByEmployer(Long employerId, Pageable pageable) {
         return jobRepository.findByEmployerId(employerId, pageable)
-            .map(this::mapEntityToResponse);
+                .map(this::mapEntityToResponse);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<JobResponse> searchJobs(
-        String title,
-        String location,
-        Job.JobType jobType,
-        Job.ExperienceLevel experienceLevel,
-        java.math.BigDecimal minSalary,
-        java.math.BigDecimal maxSalary,
-        Boolean isRemote,
-        Pageable pageable
-    ) {
+            String title,
+            String location,
+            Job.JobType jobType,
+            Job.ExperienceLevel experienceLevel,
+            java.math.BigDecimal minSalary,
+            java.math.BigDecimal maxSalary,
+            Boolean isRemote,
+            Pageable pageable) {
         return jobRepository.searchJobs(
-            title, location, jobType, experienceLevel,
-            minSalary, maxSalary, isRemote, pageable
-        ).map(this::mapEntityToResponse);
+                title, location, jobType, experienceLevel,
+                minSalary, maxSalary, isRemote, Job.ApprovalStatus.APPROVED, pageable).map(this::mapEntityToResponse);
     }
-    
+
     @Override
     public JobResponse toggleJobStatus(Long jobId, Long employerId, boolean isActive) {
         Job job = jobRepository.findByIdAndEmployerId(jobId, employerId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Job not found with id: " + jobId + " for employer: " + employerId));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Job not found with id: " + jobId + " for employer: " + employerId));
+
         job.setActive(isActive);
         Job updatedJob = jobRepository.save(job);
         return mapEntityToResponse(updatedJob);
     }
-    
+
+    @Override
+    public JobResponse rejectJob(Long jobId) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + jobId));
+
+        job.setApprovalStatus(Job.ApprovalStatus.REJECTED);
+        job.setActive(false);
+
+        Job updatedJob = jobRepository.save(job);
+        return mapEntityToResponse(updatedJob);
+    }
+
     private void mapRequestToEntity(JobRequest request, Job job) {
         job.setTitle(request.getTitle());
         job.setDescription(request.getDescription());
@@ -127,7 +147,7 @@ public class JobServiceImpl implements JobService {
         job.setRemote(request.isRemote());
         job.setApplicationDeadline(request.getApplicationDeadline());
         job.setVacancies(request.getVacancies());
-        
+
         if (request.getRequiredSkills() != null) {
             job.setRequiredSkills(request.getRequiredSkills());
         }
@@ -135,7 +155,7 @@ public class JobServiceImpl implements JobService {
             job.setBenefits(request.getBenefits());
         }
     }
-    
+
     private JobResponse mapEntityToResponse(Job job) {
         JobResponse response = new JobResponse();
         response.setId(job.getId());
@@ -151,6 +171,7 @@ public class JobServiceImpl implements JobService {
         response.setSalaryCurrency(job.getSalaryCurrency());
         response.setRemote(job.isRemote());
         response.setActive(job.isActive());
+        response.setApprovalStatus(job.getApprovalStatus());
         response.setApplicationDeadline(job.getApplicationDeadline());
         response.setVacancies(job.getVacancies());
         response.setRequiredSkills(job.getRequiredSkills());
@@ -158,13 +179,11 @@ public class JobServiceImpl implements JobService {
         response.setEmployerId(job.getEmployer().getId());
         response.setEmployerName(job.getEmployer().getFirstName() + " " + job.getEmployer().getLastName());
         response.setEmployerCompanyName(job.getEmployer().getCompanyName());
+        // Employer contact email is stored on the User (parent) as email
+        response.setEmployerContactEmail(job.getEmployer().getEmail());
         response.setCreatedAt(job.getCreatedAt());
         response.setUpdatedAt(job.getUpdatedAt());
         response.setApplicationCount((long) job.getApplications().size());
         return response;
     }
 }
-
-
-
-

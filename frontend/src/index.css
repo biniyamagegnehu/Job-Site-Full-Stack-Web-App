@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+:root {
+  --color-brand-primary: #2563eb;
+  /* Royal Blue */
+  --color-brand-secondary: #4f46e5;
+  /* Indigo */
+  --color-brand-accent: #0ea5e9;
+  /* Sky Blue */
+  --color-bg-light: #f8fafc;
+  --color-card-light: #ffffff;
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  --color-blue: var(--color-brand-primary);
+  --color-indigo: var(--color-brand-secondary);
+  --color-sky: var(--color-brand-accent);
+  --color-light: var(--color-bg-light);
+  --color-surface: var(--color-card-light);
+
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+/* Base resets and Typography */
+body {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
+  color: var(--color-text-main);
+}
+
+/* Professional Components */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.glass-accent {
+  background: rgba(37, 99, 235, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+/* Buttons */
+.btn-futuristic {
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  background-color: var(--color-brand-primary);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-futuristic:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Cards */
+.futuristic-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.futuristic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Input Fields */
+.input-futuristic {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: var(--color-text-main);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.input-futuristic:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+/* Animation utilities */
+.reveal-text {
+  background: linear-gradient(to right, var(--color-brand-primary), var(--color-brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+}
+
+/* Common text colors for Light Mode */
+.text-cyan {
+  color: var(--color-brand-primary);
+}
+
+.text-purple {
+  color: var(--color-brand-secondary);
+}
+
+.text-magenta {
+  color: #db2777;
+}
+
+.text-accent-lime {
+  color: #059669;
+}
+
+.bg-cyan {
+  background-color: var(--color-brand-primary);
+}
+
+.bg-purple {
+  background-color: var(--color-brand-secondary);
+}
+
+.bg-magenta {
+  background-color: #db2777;
+}
+
+.bg-accent-lime {
+  background-color: #ecfdf5;
+}
+
+.text-glow {
+  text-shadow: none;
+}
+
+.text-glow-purple {
+  text-shadow: none;
+}
