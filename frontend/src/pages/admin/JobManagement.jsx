@@ -61,10 +61,24 @@ const JobManagement = () => {
                 setJobs(prev => prev.map(j => j.id === job.id ? { ...j, isActive: false } : j));
             } else {
                 await adminApi.approveJob(job.id);
-                setJobs(prev => prev.map(j => j.id === job.id ? { ...j, isActive: true } : j));
+                setJobs(prev => prev.map(j => j.id === job.id ? { ...j, isActive: true, approvalStatus: 'APPROVED' } : j));
             }
         } catch (err) {
             alert('Status update failed');
+        } finally {
+            setActionStatus({ loading: false, id: null });
+        }
+    };
+
+    const handleRejectJob = async (job) => {
+        if (!window.confirm('Are you sure you want to reject this job? It will be marked as REJECTED and hidden from the public.')) return;
+
+        setActionStatus({ loading: true, id: job.id });
+        try {
+            await adminApi.rejectJob(job.id);
+            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, isActive: false, approvalStatus: 'REJECTED' } : j));
+        } catch (err) {
+            alert('Rejection failed');
         } finally {
             setActionStatus({ loading: false, id: null });
         }
@@ -153,20 +167,52 @@ const JobManagement = () => {
 
                                 <div className="flex items-center gap-4 w-full md:w-auto justify-end">
                                     <div className="flex flex-col items-end mr-4 hidden md:flex">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${job.isActive ? 'text-green-600' : 'text-red-500'}`}>
-                                            {job.isActive ? 'Live' : 'Hidden'}
-                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${job.isActive ? 'text-green-600' : 'text-slate-400'}`}>
+                                                {job.isActive ? 'Live' : 'Hidden'}
+                                            </span>
+                                            <span className="text-slate-200">|</span>
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${job.approvalStatus === 'APPROVED' ? 'text-green-600' :
+                                                job.approvalStatus === 'REJECTED' ? 'text-red-500' : 'text-orange-500'
+                                                }`}>
+                                                {job.approvalStatus}
+                                            </span>
+                                        </div>
                                         <span className="text-[10px] text-slate-300 font-bold uppercase mt-1">Ref No: {job.id.toString().padStart(4, '0')}</span>
                                     </div>
 
-                                    <button
-                                        onClick={() => handleToggleStatus(job)}
-                                        disabled={actionStatus.loading && actionStatus.id === job.id}
-                                        className={`p-3 rounded-xl transition-all shadow-sm ${job.isActive ? 'bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50' : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'}`}
-                                        title={job.isActive ? 'Deactivate Job' : 'Approve Job'}
-                                    >
-                                        {job.isActive ? <PowerOff className="w-5 h-5" /> : <Power className="w-5 h-5" />}
-                                    </button>
+                                    {(job.approvalStatus === 'PENDING' || job.approvalStatus === 'REJECTED') && (
+                                        <button
+                                            onClick={() => handleToggleStatus(job)}
+                                            disabled={actionStatus.loading && actionStatus.id === job.id}
+                                            className="p-3 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                            title="Approve & Publish"
+                                        >
+                                            <CheckCircle className="w-5 h-5" />
+                                        </button>
+                                    )}
+
+                                    {job.approvalStatus === 'PENDING' && (
+                                        <button
+                                            onClick={() => handleRejectJob(job)}
+                                            disabled={actionStatus.loading && actionStatus.id === job.id}
+                                            className="p-3 bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                            title="Reject Posting"
+                                        >
+                                            <XCircle className="w-5 h-5" />
+                                        </button>
+                                    )}
+
+                                    {job.approvalStatus === 'APPROVED' && (
+                                        <button
+                                            onClick={() => handleToggleStatus(job)}
+                                            disabled={actionStatus.loading && actionStatus.id === job.id}
+                                            className={`p-3 rounded-xl transition-all shadow-sm ${job.isActive ? 'bg-slate-50 text-slate-400 hover:text-orange-500 hover:bg-orange-50' : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'}`}
+                                            title={job.isActive ? 'Deactivate Posting' : 'Re-activate'}
+                                        >
+                                            {job.isActive ? <PowerOff className="w-5 h-5" /> : <Power className="w-5 h-5" />}
+                                        </button>
+                                    )}
 
                                     <button
                                         onClick={() => handleDeleteJob(job.id)}

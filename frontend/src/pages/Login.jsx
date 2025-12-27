@@ -86,7 +86,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full input-futuristic pl-12"
-                  placeholder="name@example.com"
+                  placeholder=" "
                 />
               </div>
               {errors.email && <p className="text-[10px] font-black text-red-500 uppercase tracking-tighter ml-1">{errors.email}</p>}
@@ -103,7 +103,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full input-futuristic pl-12"
-                  placeholder="••••••••"
+                  placeholder=" "
                 />
               </div>
               {errors.password && <p className="text-[10px] font-black text-red-500 uppercase tracking-tighter ml-1">{errors.password}</p>}

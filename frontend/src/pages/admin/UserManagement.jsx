@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import adminApi from '../../api/adminApi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, UserPlus, Shield, Trash2, Edit3, ShieldAlert, CheckCircle2, XCircle, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Users, UserPlus, Shield, Trash2, Edit3, ShieldAlert, CheckCircle2, XCircle, Search, ChevronLeft, ChevronRight, X, Lock, Unlock, Power } from 'lucide-react';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -63,6 +63,32 @@ const UserManagement = () => {
       fetchUsers();
     } catch (err) {
       alert('Deletion failed');
+    }
+  };
+
+  const handleStatusToggle = async (user) => {
+    try {
+      if (user.enabled) {
+        await adminApi.disableUser(user.id);
+      } else {
+        await adminApi.enableUser(user.id);
+      }
+      fetchUsers();
+    } catch (err) {
+      alert('Status update failed');
+    }
+  };
+
+  const handleLockToggle = async (user) => {
+    try {
+      if (user.locked) {
+        await adminApi.unlockUser(user.id);
+      } else {
+        await adminApi.lockUser(user.id);
+      }
+      fetchUsers();
+    } catch (err) {
+      alert('Lock toggle failed');
     }
   };
 
@@ -142,16 +168,37 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td className="p-6">
-                    {user.enabled ? (
-                      <span className="flex items-center gap-1.5 text-green-600 text-[10px] font-black uppercase"><CheckCircle2 className="w-4 h-4" /> Active</span>
-                    ) : (
-                      <span className="flex items-center gap-1.5 text-red-500 text-[10px] font-black uppercase"><XCircle className="w-4 h-4" /> Disabled</span>
-                    )}
+                    <div className="flex flex-col gap-1">
+                      {user.enabled ? (
+                        <span className="flex items-center gap-1.5 text-green-600 text-[10px] font-black uppercase"><CheckCircle2 className="w-3 h-3" /> Active</span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-slate-400 text-[10px] font-black uppercase"><XCircle className="w-3 h-3" /> Disabled</span>
+                      )}
+                      {user.locked && (
+                        <span className="flex items-center gap-1.5 text-red-500 text-[10px] font-black uppercase"><Lock className="w-3 h-3" /> Locked</span>
+                      )}
+                    </div>
                   </td>
                   <td className="p-6 text-right">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => handleOpenModal(user)} className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"><Edit3 className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(user)} className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"><Trash2 className="w-4 h-4" /></button>
+                      <button
+                        onClick={() => handleStatusToggle(user)}
+                        title={user.enabled ? "Disable Account" : "Enable Account"}
+                        className={`p-3 rounded-xl transition-all ${user.enabled ? 'bg-slate-50 text-slate-400 hover:text-orange-500 hover:bg-orange-50' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        onClick={() => handleLockToggle(user)}
+                        title={user.locked ? "Unlock Account" : "Lock Account"}
+                        className={`p-3 rounded-xl transition-all ${user.locked ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50'}`}
+                      >
+                        {user.locked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                      </button>
+
+                      <button onClick={() => handleOpenModal(user)} title="Edit Details" className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"><Edit3 className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(user)} title="Delete User" className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

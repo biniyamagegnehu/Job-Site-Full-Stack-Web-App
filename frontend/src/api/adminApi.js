@@ -43,6 +43,18 @@ export const adminApi = {
 
   updateUser: (id, userData) =>
     axiosInstance.put(`/api/admin/users/${id}`, userData),
+
+  enableUser: (id) =>
+    axiosInstance.patch(`/api/admin/users/${id}/enable`),
+
+  disableUser: (id) =>
+    axiosInstance.patch(`/api/admin/users/${id}/disable`),
+
+  lockUser: (id) =>
+    axiosInstance.patch(`/api/admin/users/${id}/lock`),
+
+  unlockUser: (id) =>
+    axiosInstance.patch(`/api/admin/users/${id}/unlock`),
 };
 
 export default adminApi;

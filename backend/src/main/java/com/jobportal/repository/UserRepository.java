@@ -13,24 +13,22 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
+
     Optional<User> findByEmail(String email);
-    
+
     Optional<User> findByUsername(String username);
-    
+
     boolean existsByEmail(String email);
-    
+
     boolean existsByUsername(String username);
-    
+
     List<User> findByRole(UserRole role);
-    
-    @Query("SELECT u FROM User u WHERE u.isEnabled = :enabled")
-    List<User> findByEnabled(@Param("enabled") boolean enabled);
-    
+
+    List<User> findByIsEnabled(boolean isEnabled);
+
     // For employer approval workflow
-    @Query("SELECT u FROM User u WHERE u.role = :role AND u.isEnabled = :enabled")
-    List<User> findByRoleAndEnabled(@Param("role") UserRole role, @Param("enabled") boolean enabled);
-    
+    List<User> findByRoleAndIsEnabled(UserRole role, boolean isEnabled);
+
     // Search users by email or username
     @Query("SELECT u FROM User u WHERE u.email LIKE %:query% OR u.username LIKE %:query%")
     List<User> searchByEmailOrUsername(@Param("query") String query);

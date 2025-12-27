@@ -37,6 +37,10 @@ export const employerApi = {
   // Dashboard Stats
   getDashboardStats: () =>
     axiosInstance.get('/api/employer/dashboard/stats'),
+
+  // Profiles
+  getApplicantProfile: (id) =>
+    axiosInstance.get(`/api/job-seekers/${id}/profile`),
 };
 
 export default employerApi;
